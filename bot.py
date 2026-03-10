@@ -1,6 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 import yt_dlp
+from telegram.ext import CommandHandler
 
 TOKEN = "8652648742:AAEkpHJw0kJrnxPoVC_otZvghRN__tbL_RU"
 
@@ -27,6 +28,11 @@ async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text("Select quality:", reply_markup=reply_markup)
+    
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "👋 Welcome!\n\nPlease send a video link (YouTube / Instagram / Facebook) to download."
+    )
 
 async def quality_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -41,7 +47,9 @@ async def quality_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 app = ApplicationBuilder().token(TOKEN).build()
 
+app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_link))
 app.add_handler(CallbackQueryHandler(quality_selected))
 
 app.run_polling()
+
